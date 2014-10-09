@@ -23,12 +23,14 @@
 
             <div class="row-fluid">
                 <div class="span4">
-                    <li ng-repeat="doc in exctl.hits">
-                        {{doc._source.year}} <br /> 
-                        <div ng-repeat="snip in doc.highlight.content">
-                            <p ng-bind-html="snip"></p>
-                        </div>
-                    </li>
+                    <div ng-repeat="doc in exctl.hits">
+                        <div><strong>{{doc._source.year}}</strong> &middot; <em>{{doc._source.name}}</em></div> 
+                        <p>
+                            <span ng-repeat="snip in doc.highlight.content">
+                                <span ng-bind-html="snip"></span><br />
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,12 +75,12 @@
     ExampleApp.controller('ExampleController', ['client', 'esFactory', function (client, esFactory) {
 
       var self = this;
-      var hl = ejs.Highlight('content');
+      var hl = ejs.Highlight('content').fragmentSize(120).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
       
       client.search({
           index: 'fashion_test',
           type: 'case',
-          body: ejs.Request().query(ejs.MatchQuery('content', 'public domain')).sort('year').highlight(hl)
+          body: ejs.Request().query(ejs.MatchQuery('content', 'piracy')).size(100).highlight(hl).sort('year')
       }).then(function (resp) {
                 self.hits = resp.hits.hits;
              }, 
