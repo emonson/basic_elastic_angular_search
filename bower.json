@@ -1,0 +1,23 @@
+{
+  "name": "basic_elastic_angular_search",
+  "version": "0.0.1",
+  "authors": [
+    "Spencer Alger <spencer@spenceralger.com>",
+    "Eric E Monson <emonson@cs.duke.edu>"
+  ],
+  "description": "A simple example that details all steps needed to setup angular and the elasticsearch.js client along with elastic.js for easier api",
+  "main": "index.html",
+  "keywords": [
+    "elasticsearch",
+    "angularjs"
+  ],
+  "license": "Apache 2.0",
+  "private": true,
+  "dependencies": {
+    "elasticsearch": "~2.2.0",
+    "elastic.js": "~1.2.0",
+    "angular": "~1.2.19",
+    "angular-sanitize": "~1.2.19",
+    "bootstrap": "~3.2.0"
+  }
+}
