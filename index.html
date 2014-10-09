@@ -74,28 +74,30 @@
     // error which might come back from the client
     ExampleApp.controller('ExampleController', ['client', 'esFactory', function (client, esFactory) {
 
-      var self = this;
-      var hl = ejs.Highlight('content').fragmentSize(120).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
-      
-      client.search({
-          index: 'fashion_test',
-          type: 'case',
-          body: ejs.Request().query(ejs.MatchQuery('content', 'piracy')).size(100).highlight(hl).sort('year')
-      }).then(function (resp) {
-                self.hits = resp.hits.hits;
-             }, 
-             function (err) {
-                self.error = err;
+        var self = this;
+        var hl = ejs.Highlight('content').fragmentSize(120).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
+        self.queryTerm = '*';
 
-                // if the err is a NoConnections error, then the client was not able to
-                // connect to elasticsearch. In that case, create a more detailed error
-                // message
-                if (err instanceof esFactory.errors.NoConnections) {
-                  self.error = new Error('Unable to connect to elasticsearch. ' +
-                    'Make sure that it is running and listening at http://localhost:9200');
-                }
-             });
+        self.search = function() {
+            client.search({
+              index: 'fashion_test',
+              type: 'case',
+              body: ejs.Request().query(ejs.MatchQuery('content', self.queryTerm || '*')).size(100).highlight(hl).sort('year')
+            }).then(function (resp) {
+                    self.hits = resp.hits.hits;
+                 }, 
+                 function (err) {
+                    self.error = err;
 
+                    // if the err is a NoConnections error, then the client was not able to
+                    // connect to elasticsearch. In that case, create a more detailed error
+                    // message
+                    if (err instanceof esFactory.errors.NoConnections) {
+                      self.error = new Error('Unable to connect to elasticsearch. ' +
+                        'Make sure that it is running and listening at http://localhost:9200');
+                    }
+                 });
+        };
 
     }]);
   </script>
