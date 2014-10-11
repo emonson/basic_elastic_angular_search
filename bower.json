@@ -14,10 +14,10 @@
   "license": "Apache 2.0",
   "private": true,
   "dependencies": {
-    "elasticsearch": "~2.2.0",
+    "elasticsearch": "~2.4.0",
     "elastic.js": "~1.2.0",
-    "angular": "~1.2.19",
-    "angular-sanitize": "~1.2.19",
+    "angular": "~1.2.26",
+    "angular-sanitize": "~1.2.26",
     "bootstrap": "~3.2.0"
   }
 }

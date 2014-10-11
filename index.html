@@ -63,7 +63,7 @@
     ExampleApp.service('client', function (esFactory) {
       return esFactory({
         host: 'localhost:9200',
-        apiVersion: '1.2',
+        apiVersion: '1.3',
         log: 'trace'
       });
     });
@@ -79,14 +79,16 @@
 
         var self = this;
         var hl = ejs.Highlight('content').fragmentSize(120).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
-        self.queryTerm = '*';
+        self.queryTerm = '';
+        var qs = ejs.QueryStringQuery(self.queryTerm);
 
-        self.search = function() {
+        self.search2 = function() {
             client.search({
               index: 'fashion_test',
               type: 'case',
-              body: ejs.Request().query(ejs.MatchQuery('content', self.queryTerm || '*')).size(100).highlight(hl).sort('year')
+              body: ejs.Request().query(qs)
             }).then(function (resp) {
+                    console.log(resp.hits);
                     self.hits = resp.hits.hits;
                  }, 
                  function (err) {
@@ -101,6 +103,36 @@
                     }
                  });
         };
+        
+        self.search = function() {
+            client.search({
+                  index: 'fashion_test',
+                  type: 'case',
+                  body: {
+                    query: {
+                      match: {
+                        content: self.queryTerm
+                      }
+                    },
+                     highlight: {
+                        fields: {
+                          content: {
+                            type: "experimental",
+                            fragment_size: 50,
+                            number_of_fragments: 1
+                          }
+                        }
+                      }
+                  }                  
+                }).then(function (body) {
+                  self.hits = body.hits.hits;
+                  console.log(self.hits);
+                }, function (error) {
+                  console.trace(error.message);
+                });
+        };
+
+
 
     }]);
   </script>
