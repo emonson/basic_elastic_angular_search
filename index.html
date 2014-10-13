@@ -79,13 +79,13 @@
 
         var self = this;
         var hl = ejs.Highlight('content').fragmentSize(120).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
-        self.queryTerm = '*';
+        self.queryTerm = '';
 
         self.search = function() {
             client.search({
               index: 'fashion_test',
               type: 'case',
-              body: ejs.Request().query(ejs.MatchQuery('content', self.queryTerm || '*')).size(100).highlight(hl).sort('year')
+              body: ejs.Request().query(ejs.MatchQuery('content', self.queryTerm)).size(100).highlight(hl).sort('year')
             }).then(function (resp) {
                     self.hits = resp.hits.hits;
                  }, 
