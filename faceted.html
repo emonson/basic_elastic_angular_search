@@ -32,8 +32,26 @@
        <div class="row">
             <div class="col-md-4">
                 <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.tags.terms">
-                    <li ng-class="exctl.isActive('Tags', entry.term)">
-                    <a ng-click="exctl.filter('Tags', entry.term)">
+                    <li ng-class="exctl.isActive('subject_tags', entry.term)">
+                    <a ng-click="exctl.filter('subject_tags', entry.term)">
+                        {{ entry.term }} 
+                        <span class="badge pull-right">{{ entry.count }}</span>
+                    </a>
+                    </li>
+                </ul>
+                <hr />
+                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.courts.terms">
+                    <li ng-class="exctl.isActive('court', entry.term)">
+                    <a ng-click="exctl.filter('court', entry.term)">
+                        {{ entry.term }} 
+                        <span class="badge pull-right">{{ entry.count }}</span>
+                    </a>
+                    </li>
+                </ul>
+                <hr />
+                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.ip_category.terms">
+                    <li ng-class="exctl.isActive('tags', entry.term)">
+                    <a ng-click="exctl.filter('tags', entry.term)">
                         {{ entry.term }} 
                         <span class="badge pull-right">{{ entry.count }}</span>
                     </a>
@@ -43,9 +61,9 @@
             
             <div class="col-md-8">
                 <div ng-repeat="doc in exctl.results.hits.hits">
-                    <div><strong>{{doc._source.CreationDate}}</strong> &middot; <em>{{doc._source.Title}}</em></div> 
+                    <div><strong>{{doc._source.year}}</strong> &middot; <em>{{doc._source.name}}</em></div> 
                         <p>
-                            <span ng-repeat="snip in doc.highlight.Body">
+                            <span ng-repeat="snip in doc.highlight.content">
                                 <span ng-bind-html="snip"></span><br />
                             </span>
                         </p>
@@ -97,17 +115,19 @@
     ExampleApp.controller('ExampleController', ['client', 'esFactory', function (client, esFactory) {
 
         var self = this;
-        self.queryTerm = 'javascript';
-        var tf = ejs.TermsFacet('tags').field('Tags').size(10);
-        var hl = ejs.Highlight('Body').fragmentSize(120).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
+        self.queryTerm = 'piracy';
+        var sf = ejs.TermsFacet('tags').field('subject_tags').size(10);
+        var cf = ejs.TermsFacet('courts').field('court').size(10);
+        var tf = ejs.TermsFacet('ip_category').field('tags').size(10);
+        var hl = ejs.Highlight('content').fragmentSize(80).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
 
         self.search = function() {
             client.search({
-              index: 'stackoverflow',
-              type: 'question',
-              body: ejs.Request().facet(tf).query(applyFilters(ejs.MatchQuery('Body', self.queryTerm))).size(100).highlight(hl).sort('CreationDate')
+              index: 'fashion_test',
+              type: 'case',
+              body: ejs.Request().facet(cf).facet(sf).facet(tf).query(applyFilters(ejs.MatchQuery('content', self.queryTerm))).size(100).highlight(hl).sort('year')
             }).then(function (resp) {
-                    // console.log(resp);
+                    console.log(resp);
                     self.results = resp;
                  }, 
                  function (err) {
