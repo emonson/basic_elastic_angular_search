@@ -9,17 +9,15 @@
 
     <title>Elasticsearch + Angular Example</title>
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom styles for this template -->
-    <link href="offcanvas.css" rel="stylesheet">
+
 </head>
 <body ng-app="ExampleApp">
   
   <!-- overall container and controller -->
-  <div ng-controller="ExampleController as exctl">
+  <div ng-controller="ExampleController as exctl" class="container">
     
     <!-- navbar search box -->
-    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+    <nav class="navbar navbar-default" role="navigation">
         <div class="container">
         <form ng-submit="exctl.search()" class="navbar-form navbar-left" role="search">
             <div class="form-group">
@@ -31,81 +29,71 @@
     </nav>
     
     <!-- main content container -->
-    <div class="container">
-       <div class="row row-offcanvas row-offcanvas-right">
+    <div class="row">
             
-            <!-- search results -->
-            <div class="col-xs-12 col-sm-9">
-                
-                <!-- error -->
-                <div ng-if="exctl.error" class="alert alert-danger" role="alert">{{exctl.error.message}}</div>
-                
-                <!-- hits -->
-                <div ng-repeat="doc in exctl.results.hits.hits">
-                    <div><strong>{{doc._source.year}}</strong> &middot; <em>{{doc._source.name}}</em></div> 
-                        <p>
-                            <span ng-repeat="snip in doc.highlight.content">
-                                <span ng-bind-html="snip"></span><br />
-                            </span>
-                        </p>
-                    </div>
+        <!-- search results -->
+        <div class="col-sm-9">
+
+            <!-- error -->
+            <div ng-if="exctl.error" class="alert alert-danger" role="alert">{{exctl.error.message}}</div>
+
+            <!-- hits -->
+            <div ng-repeat="doc in exctl.results.hits.hits">
+                <div>
+                    <span><strong>{{doc._source.year}}</strong> &middot; <small>{{doc._source.name}}</small></span>
+                    <p>
+                        <span ng-repeat="snip in doc.highlight.content">
+                            <span ng-bind-html="snip"></span><br />
+                        </span>
+                    </p>
                 </div>
-                
-            </div> 
+            </div>
 
-                <!-- subject tags -->
-<!-- 
-                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.tags.terms">
-                    <li ng-class="exctl.isActive('subject_tags', entry.term)">
-                    <a ng-click="exctl.filter('subject_tags', entry.term)">
-                        {{ entry.term }} 
-                        <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                    </li>
-                </ul>
- -->
-                
-            <!-- facets -->
-            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-                
-                <!-- subject tags -->
-                <div class="list-group">
-                    <a href="#" class="list-group-item" 
-                                   ng-class="exctl.isActive('subject_tags', entry.term)"
-                                   ng-click="exctl.filter('subject_tags', entry.term)"
-                                   ng-repeat="entry in exctl.results.facets.tags.terms">
-                        {{ entry.term }} <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                </div>
+        </div> <!-- search results col -->
 
-                <!-- court name -->
-<!-- 
-                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.courts.terms">
-                    <li ng-class="exctl.isActive('court', entry.term)">
-                    <a ng-click="exctl.filter('court', entry.term)">
-                        {{ entry.term }} 
-                        <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                    </li>
-                </ul>
-                
-                <!~~ ip case type tag ~~>
-                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.ip_category.terms">
-                    <li ng-class="exctl.isActive('tags', entry.term)">
-                    <a ng-click="exctl.filter('tags', entry.term)">
-                        {{ entry.term }} 
-                        <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                    </li>
-                </ul>
- -->
-                
-            </div> 
-            
-        </div> <!-- main container row -->
 
-    </div> <!-- main content container -->
+        <!-- facets -->
+        <div class="col-sm-3">
+        
+            <!-- subject tags -->
+            <ul class="list-group">
+                <li class="list-group-item" 
+                               ng-class="exctl.isActive('subject_tags', entry.term)"
+                               ng-click="exctl.filter('subject_tags', entry.term)"
+                               ng-repeat="entry in exctl.results.facets.tags.terms"> 
+                    {{ entry.term }} 
+                    <span class="glyphicon glyphicon-remove" ng-show="exctl.isActive('subject_tags', entry.term)"></span>
+                    <span class="badge pull-right">{{ entry.count }}</span>
+                </li>
+            </ul>
 
+            <!-- ip case type tag -->
+            <ul class="list-group">
+                <li class="list-group-item" 
+                               ng-class="exctl.isActive('tags', entry.term)"
+                               ng-click="exctl.filter('tags', entry.term)"
+                               ng-repeat="entry in exctl.results.facets.ip_category.terms"> 
+                    {{ entry.term }} 
+                    <span class="glyphicon glyphicon-remove" ng-show="exctl.isActive('tags', entry.term)"></span>
+                    <span class="badge pull-right">{{ entry.count }}</span>
+                </li>
+            </ul>
+
+            <!-- court name -->
+            <ul class="list-group">
+                <li class="list-group-item" 
+                               ng-class="exctl.isActive('court', entry.term)"
+                               ng-click="exctl.filter('court', entry.term)"
+                               ng-repeat="entry in exctl.results.facets.courts.terms"> 
+                    {{ entry.term }} 
+                    <span class="glyphicon glyphicon-remove" ng-show="exctl.isActive('court', entry.term)"></span>
+                    <span class="badge pull-right">{{ entry.count }}</span>
+                </li>
+            </ul>
+       
+        </div> <!-- facets col -->
+    
+    </div> <!-- main container row -->
 
   </div> <!-- controller -->
 
@@ -117,6 +105,12 @@
 
   <!-- app code starts is here -->
   <script>
+    // Elasticsearch + AngularJS example from 
+    // https://gist.github.com/egaumer/5101149
+    // http://www.fullscale.co/blog/2013/03/07/getting_started_with_elasticsearch_and-AngularJS_faceting.html
+    // 
+    // Translated slightly to new AngularJS and elasticsearch.js and elastic.js APIs
+    // 14 Oct 2014 – Eric E Monson – Duke University
     
     // App module
     var ExampleApp = angular.module('ExampleApp', ['elasticsearch', 'ngSanitize']);
@@ -137,13 +131,22 @@
     ExampleApp.controller('ExampleController', ['client', 'esFactory', function (client, esFactory) {
 
         var self = this;
-        self.queryTerm = 'piracy';
+        // pre-seeded for development
+        self.queryTerm = 'privacy';
+        
         var sf = ejs.TermsFacet('tags').field('subject_tags').size(10);
         var cf = ejs.TermsFacet('courts').field('court').size(10);
         var tf = ejs.TermsFacet('ip_category').field('tags').size(10);
-        var hl = ejs.Highlight('content').fragmentSize(80).numberOfFragments(100).encoder('html').preTags('<strong>').postTags('</strong>');
-
+        var hl = ejs.Highlight('content').fragmentSize(80).numberOfFragments(100).encoder('html').preTags('<mark>').postTags('</mark>');
+        var activeFilters = {};
+        var previous_term = '';
+        
         self.search = function() {
+            // If new term, want to clear out filters
+            if (self.queryTerm != previous_term) {
+                previous_term = self.queryTerm;
+                activeFilters = {};
+            }
             client.search({
               index: 'fashion_test',
               type: 'case',
@@ -164,8 +167,6 @@
                  });
         };
         
-        var activeFilters = {};
-
         self.isActive = function (field, term) {
             return activeFilters.hasOwnProperty(field + term) ? 'active' : '';
         };
