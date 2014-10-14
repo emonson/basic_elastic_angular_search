@@ -1,17 +1,26 @@
 <!DOCTYPE html>
-<html ng-app="ExampleApp">
+<html lang="en">
 <head>
-  <title>Elasticsearch + Angular Example</title>
-  <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Elasticsearch + Angular Example</title>
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    <link href="offcanvas.css" rel="stylesheet">
 </head>
-<!-- boot angular with the ExampleApp module -->
-<body>
+<body ng-app="ExampleApp">
   
-  <!-- attach the ExampleController to our main content -->
+  <!-- overall container and controller -->
   <div ng-controller="ExampleController as exctl">
     
-    <nav class="navbar navbar-default" role="navigation">
-        <div class="container-fluid">
+    <!-- navbar search box -->
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+        <div class="container">
         <form ng-submit="exctl.search()" class="navbar-form navbar-left" role="search">
             <div class="form-group">
               <input type="text" ng-model="exctl.queryTerm" class="form-control" placeholder="Search">
@@ -20,46 +29,18 @@
         </form>
         </div>
     </nav>
-
-    <div class="row">
-        <div class="container-fluid">
-            <!-- if there is an error, display its message -->
-            <div ng-if="exctl.error" class="alert alert-danger" role="alert">{{exctl.error.message}}</div>
-        </div>
-    </div>
     
+    <!-- main content container -->
     <div class="container">
-       <div class="row">
-            <div class="col-md-4">
-                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.tags.terms">
-                    <li ng-class="exctl.isActive('subject_tags', entry.term)">
-                    <a ng-click="exctl.filter('subject_tags', entry.term)">
-                        {{ entry.term }} 
-                        <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                    </li>
-                </ul>
-                <hr />
-                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.courts.terms">
-                    <li ng-class="exctl.isActive('court', entry.term)">
-                    <a ng-click="exctl.filter('court', entry.term)">
-                        {{ entry.term }} 
-                        <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                    </li>
-                </ul>
-                <hr />
-                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.ip_category.terms">
-                    <li ng-class="exctl.isActive('tags', entry.term)">
-                    <a ng-click="exctl.filter('tags', entry.term)">
-                        {{ entry.term }} 
-                        <span class="badge pull-right">{{ entry.count }}</span>
-                    </a>
-                    </li>
-                </ul>
-            </div>
+       <div class="row row-offcanvas row-offcanvas-right">
             
-            <div class="col-md-8">
+            <!-- search results -->
+            <div class="col-xs-12 col-sm-9">
+                
+                <!-- error -->
+                <div ng-if="exctl.error" class="alert alert-danger" role="alert">{{exctl.error.message}}</div>
+                
+                <!-- hits -->
                 <div ng-repeat="doc in exctl.results.hits.hits">
                     <div><strong>{{doc._source.year}}</strong> &middot; <em>{{doc._source.name}}</em></div> 
                         <p>
@@ -69,11 +50,61 @@
                         </p>
                     </div>
                 </div>
-            </div>
+                
+            </div> 
 
-        </div> <!-- row -->
+                <!-- subject tags -->
+<!-- 
+                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.tags.terms">
+                    <li ng-class="exctl.isActive('subject_tags', entry.term)">
+                    <a ng-click="exctl.filter('subject_tags', entry.term)">
+                        {{ entry.term }} 
+                        <span class="badge pull-right">{{ entry.count }}</span>
+                    </a>
+                    </li>
+                </ul>
+ -->
+                
+            <!-- facets -->
+            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                
+                <!-- subject tags -->
+                <div class="list-group">
+                    <a href="#" class="list-group-item" 
+                                   ng-class="exctl.isActive('subject_tags', entry.term)"
+                                   ng-click="exctl.filter('subject_tags', entry.term)"
+                                   ng-repeat="entry in exctl.results.facets.tags.terms">
+                        {{ entry.term }} <span class="badge pull-right">{{ entry.count }}</span>
+                    </a>
+                </div>
 
-    </div> <!-- container -->
+                <!-- court name -->
+<!-- 
+                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.courts.terms">
+                    <li ng-class="exctl.isActive('court', entry.term)">
+                    <a ng-click="exctl.filter('court', entry.term)">
+                        {{ entry.term }} 
+                        <span class="badge pull-right">{{ entry.count }}</span>
+                    </a>
+                    </li>
+                </ul>
+                
+                <!~~ ip case type tag ~~>
+                <ul class="nav nav-pills nav-stacked" style="max-width: 200px;" ng-repeat="entry in exctl.results.facets.ip_category.terms">
+                    <li ng-class="exctl.isActive('tags', entry.term)">
+                    <a ng-click="exctl.filter('tags', entry.term)">
+                        {{ entry.term }} 
+                        <span class="badge pull-right">{{ entry.count }}</span>
+                    </a>
+                    </li>
+                </ul>
+ -->
+                
+            </div> 
+            
+        </div> <!-- main container row -->
+
+    </div> <!-- main content container -->
 
 
   </div> <!-- controller -->
@@ -86,16 +117,11 @@
 
   <!-- app code starts is here -->
   <script>
+    
     // App module
-    //
-    // The app module will contain all of the components the app needs (directives,
-    // controllers, services, etc.). Since it will be using the components within
-    // the elasticsearch module, define it a dependency.
     var ExampleApp = angular.module('ExampleApp', ['elasticsearch', 'ngSanitize']);
 
-    // Service
-    //
-    // esFactory() creates a configured client instance. Turn that instance
+    // Service – esFactory() creates a configured client instance. Turn that instance
     // into a service so that it can be required by other parts of the application
     ExampleApp.service('client', function (esFactory) {
       return esFactory({
@@ -105,13 +131,9 @@
       });
     });
 
-    // Controller
-    //
-    // It requires the "client" service, and fetches information about the server,
-    // it adds either an error or info about the server to $scope.
-    //
-    // It also requires the esFactory to that it can check for a specific type of
-    // error which might come back from the client
+    // Controller – requires the "client" service, and fetches information about the server,
+    //   it adds either an error or info about the server to $scope. It also requires the esFactory
+    //   to that it can check for a specific type of error which might come back from the client
     ExampleApp.controller('ExampleController', ['client', 'esFactory', function (client, esFactory) {
 
         var self = this;
@@ -134,8 +156,7 @@
                     self.error = err;
 
                     // if the err is a NoConnections error, then the client was not able to
-                    // connect to elasticsearch. In that case, create a more detailed error
-                    // message
+                    // connect to elasticsearch. In that case, create a more detailed error message
                     if (err instanceof esFactory.errors.NoConnections) {
                       self.error = new Error('Unable to connect to elasticsearch. ' +
                         'Make sure that it is running and listening at http://localhost:9200');
